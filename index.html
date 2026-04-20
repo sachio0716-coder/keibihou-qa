@@ -1,0 +1,957 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>警備業法 Q&A ナビ</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Kaku Gothic ProN', 'Noto Sans JP', sans-serif;
+  background: #f0f4f8;
+  color: #1a202c;
+  min-height: 100vh;
+}
+
+/* ===== ヘッダー ===== */
+.header {
+  background: linear-gradient(135deg, #1e3a5f 0%, #2c5282 100%);
+  color: white;
+  padding: 20px 16px 16px;
+  text-align: center;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+.header h1 { font-size: 1.3rem; font-weight: 700; margin-bottom: 4px; }
+.header .subtitle { font-size: 0.75rem; opacity: 0.85; margin-bottom: 12px; }
+.source-badge {
+  display: inline-block;
+  background: rgba(255,255,255,0.15);
+  border: 1px solid rgba(255,255,255,0.3);
+  border-radius: 20px;
+  padding: 4px 12px;
+  font-size: 0.7rem;
+  margin-bottom: 12px;
+}
+.source-badge a { color: #90cdf4; text-decoration: none; }
+
+/* ===== タブ切替 ===== */
+.mode-tabs {
+  display: flex;
+  max-width: 340px;
+  margin: 0 auto 12px;
+  background: rgba(255,255,255,0.15);
+  border-radius: 25px;
+  padding: 3px;
+}
+.mode-tab {
+  flex: 1;
+  padding: 8px 12px;
+  border-radius: 22px;
+  border: none;
+  background: transparent;
+  color: rgba(255,255,255,0.7);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-decoration: none;
+  text-align: center;
+  display: block;
+}
+.mode-tab.active {
+  background: white;
+  color: #1e3a5f;
+}
+
+/* ===== 検索（Q&Aモード） ===== */
+.search-box {
+  position: relative;
+  max-width: 500px;
+  margin: 0 auto;
+}
+.search-box input {
+  width: 100%;
+  padding: 12px 16px 12px 42px;
+  border: none;
+  border-radius: 25px;
+  font-size: 1rem;
+  background: rgba(255,255,255,0.95);
+  color: #1a202c;
+  outline: none;
+}
+.search-box input::placeholder { color: #a0aec0; }
+.search-icon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1.1rem;
+  color: #718096;
+}
+
+/* ===== メインコンテンツ ===== */
+.container {
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 16px;
+}
+
+/* ===== カテゴリタブ ===== */
+.category-tabs {
+  display: flex;
+  overflow-x: auto;
+  gap: 8px;
+  padding: 4px 0 12px;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.category-tabs::-webkit-scrollbar { display: none; }
+.cat-tab {
+  flex-shrink: 0;
+  padding: 8px 16px;
+  border-radius: 20px;
+  border: 1.5px solid #cbd5e0;
+  background: white;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+  text-decoration: none;
+  color: #1a202c;
+}
+.cat-tab:hover { border-color: #2c5282; color: #2c5282; }
+.cat-tab.active { background: #2c5282; color: white; border-color: #2c5282; }
+
+/* ===== Q&Aカード ===== */
+.qa-section { margin-bottom: 24px; }
+.section-title {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #2c5282;
+  padding: 8px 0;
+  border-bottom: 2px solid #2c5282;
+  margin-bottom: 8px;
+}
+.qa-card {
+  background: white;
+  border-radius: 12px;
+  margin-bottom: 8px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  overflow: hidden;
+  transition: box-shadow 0.2s;
+}
+.qa-card:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.12); }
+.qa-question {
+  padding: 14px 16px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  user-select: none;
+  text-decoration: none;
+  color: #1a202c;
+}
+.qa-question .q-mark {
+  flex-shrink: 0;
+  background: #ebf4ff;
+  color: #2c5282;
+  font-weight: 800;
+  width: 26px; height: 26px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.8rem;
+}
+.qa-question .q-text { flex: 1; line-height: 1.5; }
+.qa-question .arrow {
+  flex-shrink: 0;
+  font-size: 0.8rem;
+  color: #a0aec0;
+  transition: transform 0.3s;
+  margin-top: 4px;
+}
+.qa-card.open .arrow { transform: rotate(180deg); }
+.qa-answer {
+  display: none;
+  padding: 0 16px 16px 16px;
+  border-top: 1px solid #edf2f7;
+}
+.qa-card.open .qa-answer { display: block; }
+.qa-answer .a-label {
+  display: inline-block;
+  background: #f0fff4;
+  color: #276749;
+  font-weight: 700;
+  font-size: 0.75rem;
+  padding: 2px 10px;
+  border-radius: 10px;
+  margin: 12px 0 8px;
+}
+.qa-answer p { font-size: 0.85rem; line-height: 1.7; color: #4a5568; }
+.qa-answer .law-ref {
+  display: inline-block;
+  margin-top: 8px;
+  font-size: 0.75rem;
+  color: #2c5282;
+  background: #ebf4ff;
+  padding: 3px 10px;
+  border-radius: 8px;
+  text-decoration: none;
+}
+.qa-answer .law-ref:hover { background: #bee3f8; }
+.qa-answer .important {
+  background: #fff5f5;
+  border-left: 3px solid #e53e3e;
+  padding: 8px 12px;
+  margin-top: 8px;
+  border-radius: 0 8px 8px 0;
+  font-size: 0.8rem;
+  color: #c53030;
+}
+
+/* ===== ノーリザルト ===== */
+.no-results {
+  text-align: center;
+  padding: 40px 16px;
+  color: #a0aec0;
+}
+.no-results .icon { font-size: 2.5rem; margin-bottom: 8px; }
+
+/* ===== 法令リンクバー ===== */
+.law-links {
+  background: white;
+  border-radius: 12px;
+  padding: 14px 16px;
+  margin-bottom: 16px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+.law-links h3 { font-size: 0.8rem; color: #2c5282; margin-bottom: 8px; }
+.law-links-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+.law-link {
+  display: block;
+  padding: 8px 10px;
+  background: #f7fafc;
+  border-radius: 8px;
+  font-size: 0.75rem;
+  color: #2c5282;
+  text-decoration: none;
+  text-align: center;
+  border: 1px solid #e2e8f0;
+  transition: all 0.2s;
+}
+.law-link:hover { background: #ebf4ff; border-color: #90cdf4; }
+
+.highlight { background: #fefcbf; padding: 1px 2px; border-radius: 2px; }
+
+/* ===== フッター ===== */
+.footer {
+  text-align: center;
+  padding: 24px 16px;
+  font-size: 0.7rem;
+  color: #a0aec0;
+  border-top: 1px solid #e2e8f0;
+  margin-top: 16px;
+}
+.footer a { color: #4299e1; text-decoration: none; }
+
+/* ============================================
+   AIチャットモード
+   ============================================ */
+#aiChatPanel { display: none; }
+#aiChatPanel.active { display: flex; flex-direction: column; }
+
+/* --- チャットエリア --- */
+.chat-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+.chat-messages {
+  flex: 1;
+  min-height: 200px;
+  max-height: 55vh;
+  overflow-y: auto;
+  padding: 4px 0;
+  scroll-behavior: smooth;
+}
+.chat-msg {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 12px;
+  align-items: flex-start;
+}
+.chat-msg.user { flex-direction: row-reverse; }
+.chat-avatar {
+  flex-shrink: 0;
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.8rem; font-weight: 700;
+}
+.chat-msg.ai .chat-avatar { background: #ebf4ff; color: #2c5282; }
+.chat-msg.user .chat-avatar { background: #e2e8f0; color: #4a5568; }
+.chat-bubble {
+  max-width: 85%;
+  padding: 12px 16px;
+  border-radius: 16px;
+  font-size: 0.85rem;
+  line-height: 1.7;
+}
+.chat-msg.ai .chat-bubble {
+  background: white;
+  color: #1a202c;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  border-top-left-radius: 4px;
+}
+.chat-msg.user .chat-bubble {
+  background: #2c5282;
+  color: white;
+  border-top-right-radius: 4px;
+}
+.chat-bubble a { color: #2c5282; text-decoration: underline; }
+.chat-msg.user .chat-bubble a { color: #bee3f8; }
+
+/* --- 入力欄 --- */
+.chat-input-area {
+  display: flex;
+  gap: 8px;
+  padding: 12px 0 4px;
+  border-top: 1px solid #e2e8f0;
+  margin-top: 8px;
+}
+.chat-input-area textarea {
+  flex: 1;
+  padding: 12px 14px;
+  border: 1.5px solid #cbd5e0;
+  border-radius: 14px;
+  font-size: 0.9rem;
+  font-family: inherit;
+  resize: none;
+  outline: none;
+  min-height: 46px;
+  max-height: 120px;
+  line-height: 1.5;
+}
+.chat-input-area textarea:focus { border-color: #2c5282; }
+.send-btn {
+  align-self: flex-end;
+  width: 46px; height: 46px;
+  min-width: 46px;
+  border-radius: 50%;
+  border: none;
+  background: #2c5282;
+  color: white;
+  font-size: 1.2rem;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.2s;
+  text-decoration: none;
+}
+.send-btn:hover { background: #1e3a5f; }
+.send-btn:disabled { background: #a0aec0; cursor: not-allowed; }
+
+/* --- ローディング --- */
+.typing-indicator {
+  display: inline-flex;
+  gap: 4px;
+  padding: 8px 14px;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+.typing-dot {
+  width: 8px; height: 8px;
+  background: #a0aec0;
+  border-radius: 50%;
+  animation: bounce 1.4s infinite ease-in-out;
+}
+.typing-dot:nth-child(2) { animation-delay: 0.2s; }
+.typing-dot:nth-child(3) { animation-delay: 0.4s; }
+@keyframes bounce {
+  0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
+  40% { transform: scale(1); opacity: 1; }
+}
+
+/* --- サンプル質問 --- */
+.sample-questions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.sample-q {
+  padding: 8px 14px;
+  background: white;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 20px;
+  font-size: 0.78rem;
+  color: #4a5568;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-decoration: none;
+  display: inline-block;
+}
+.sample-q:hover { border-color: #2c5282; color: #2c5282; background: #ebf4ff; }
+
+/* ===== レスポンシブ ===== */
+@media (max-width: 480px) {
+  .header h1 { font-size: 1.1rem; }
+  .law-links-grid { grid-template-columns: 1fr; }
+  .chat-bubble { max-width: 92%; }
+}
+</style>
+/* ===== パスワード画面 ===== */
+#lockScreen {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #1e3a5f 0%, #2c5282 100%);
+}
+.lock-box {
+  background: white;
+  border-radius: 16px;
+  padding: 32px 24px;
+  max-width: 340px;
+  width: 90%;
+  text-align: center;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.2);
+}
+.lock-box h2 {
+  font-size: 1.1rem;
+  color: #1e3a5f;
+  margin-bottom: 8px;
+}
+.lock-box p {
+  font-size: 0.8rem;
+  color: #718096;
+  margin-bottom: 20px;
+}
+.lock-box input {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1.5px solid #cbd5e0;
+  border-radius: 10px;
+  font-size: 1rem;
+  outline: none;
+  text-align: center;
+  margin-bottom: 12px;
+}
+.lock-box input:focus { border-color: #2c5282; }
+.lock-box a.lock-btn {
+  display: block;
+  width: 100%;
+  padding: 12px;
+  background: #2c5282;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  text-align: center;
+}
+.lock-box a.lock-btn:hover { background: #1e3a5f; }
+.lock-error {
+  color: #c53030;
+  font-size: 0.8rem;
+  margin-top: 8px;
+  display: none;
+}
+#mainContent { display: none; }
+</style>
+</head>
+<body>
+
+<!-- ===== パスワード画面 ===== -->
+<div id="lockScreen">
+  <div class="lock-box">
+    <h2>警備業法 Q&A ナビ</h2>
+    <p>閲覧にはパスワードが必要です</p>
+    <input type="password" id="pwInput" placeholder="パスワードを入力" onkeydown="if(event.key==='Enter')unlock()">
+    <a href="javascript:void(0)" class="lock-btn" onclick="unlock()">ログイン</a>
+    <div class="lock-error" id="pwError">パスワードが違います</div>
+  </div>
+</div>
+
+<!-- ===== メインコンテンツ（パスワード認証後に表示） ===== -->
+<div id="mainContent">
+
+<!-- ===== ヘッダー ===== -->
+<div class="header">
+  <h1>警備業法 Q&A ナビ</h1>
+  <div class="subtitle">交通誘導業務の指導教育責任者のためのクイックリファレンス</div>
+  <div class="source-badge">
+    出典：<a href="https://laws.e-gov.go.jp/law/347AC0000000117" target="_blank" rel="noopener">e-Gov法令検索（政府公式）</a>
+  </div>
+
+  <!-- モード切替 -->
+  <div class="mode-tabs">
+    <a href="javascript:void(0)" class="mode-tab active" data-mode="qa" onclick="switchMode('qa')">Q&A一覧</a>
+    <a href="javascript:void(0)" class="mode-tab" data-mode="ai" onclick="switchMode('ai')">AIに質問</a>
+  </div>
+
+  <!-- 検索（Q&Aモードのみ） -->
+  <div class="search-box" id="searchBoxArea">
+    <span class="search-icon">&#x1F50D;</span>
+    <input type="text" id="searchInput" placeholder="キーワードで検索（例：教育、届出、欠格事由）">
+  </div>
+</div>
+
+<!-- ===== メイン ===== -->
+<div class="container">
+
+  <!-- ===== Q&A一覧パネル ===== -->
+  <div id="qaPanel">
+    <div class="category-tabs" id="categoryTabs">
+      <a href="javascript:void(0)" class="cat-tab active" data-cat="all">すべて</a>
+      <a href="javascript:void(0)" class="cat-tab" data-cat="basic">基本・定義</a>
+      <a href="javascript:void(0)" class="cat-tab" data-cat="license">認定・届出</a>
+      <a href="javascript:void(0)" class="cat-tab" data-cat="disqualify">欠格事由</a>
+      <a href="javascript:void(0)" class="cat-tab" data-cat="education">教育・指導</a>
+      <a href="javascript:void(0)" class="cat-tab" data-cat="traffic">交通誘導</a>
+      <a href="javascript:void(0)" class="cat-tab" data-cat="penalty">罰則</a>
+      <a href="javascript:void(0)" class="cat-tab" data-cat="inspection">検定・検査</a>
+    </div>
+
+    <div class="law-links">
+      <h3>法令原文クイックリンク（e-Gov 政府公式データベース）</h3>
+      <div class="law-links-grid">
+        <a class="law-link" href="https://laws.e-gov.go.jp/law/347AC0000000117" target="_blank" rel="noopener">警備業法（本法）</a>
+        <a class="law-link" href="https://laws.e-gov.go.jp/law/357CO0000000308" target="_blank" rel="noopener">警備業法施行令</a>
+        <a class="law-link" href="https://laws.e-gov.go.jp/law/358M50000002001" target="_blank" rel="noopener">警備業法施行規則</a>
+        <a class="law-link" href="https://www.ajssa.or.jp/security/laws-data/" target="_blank" rel="noopener">全警協 法令データ</a>
+      </div>
+    </div>
+
+    <div id="qaContent"></div>
+    <div class="no-results" id="noResults" style="display:none;">
+      <div class="icon">&#x1F50D;</div>
+      <p>該当するQ&Aが見つかりませんでした</p>
+      <p style="font-size:0.8rem; margin-top:8px;">別のキーワードで検索するか、カテゴリを切り替えてみてください</p>
+    </div>
+  </div>
+
+  <!-- ===== AIチャットパネル ===== -->
+  <div id="aiChatPanel">
+
+    <!-- チャット本体 -->
+    <div class="chat-area" id="chatArea">
+      <div class="sample-questions" id="sampleQuestions">
+        <a href="javascript:void(0)" class="sample-q" onclick="askSample(this)">新任教育は何時間必要？</a>
+        <a href="javascript:void(0)" class="sample-q" onclick="askSample(this)">検定配置路線とは？</a>
+        <a href="javascript:void(0)" class="sample-q" onclick="askSample(this)">立入検査で見られる書類は？</a>
+        <a href="javascript:void(0)" class="sample-q" onclick="askSample(this)">前科があっても警備員になれる？</a>
+        <a href="javascript:void(0)" class="sample-q" onclick="askSample(this)">苦情処理簿には何を書く？</a>
+        <a href="javascript:void(0)" class="sample-q" onclick="askSample(this)">教育記録の保管期間は？</a>
+      </div>
+
+      <div class="chat-messages" id="chatMessages">
+        <div class="chat-msg ai">
+          <div class="chat-avatar">AI</div>
+          <div class="chat-bubble">警備業法についてお気軽にご質問ください。e-Gov法令検索の情報をもとに、分かりやすくお答えします。<br><br>例：「交通誘導中に事故が起きたら、会社の責任はどうなる？」</div>
+        </div>
+      </div>
+
+      <div class="chat-input-area">
+        <textarea id="chatInput" placeholder="質問を入力..." rows="1" onkeydown="handleKey(event)"></textarea>
+        <a href="javascript:void(0)" class="send-btn" id="sendBtn" onclick="sendMessage()">&#9654;</a>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ===== フッター ===== -->
+<div class="footer">
+  <p>法令の原文は <a href="https://laws.e-gov.go.jp/law/347AC0000000117" target="_blank" rel="noopener">e-Gov法令検索</a> で常に最新版を確認できます。</p>
+  <p style="margin-top:4px;">e-Govは総務省運営の公式データベースで、改正の都度更新されます。</p>
+  <p style="margin-top:4px;">AIの回答は参考情報です。重要な判断は必ず原文で確認してください。</p>
+  <p style="margin-top:8px;">最終更新：2026年4月20日</p>
+</div>
+
+</div><!-- /mainContent -->
+
+<script>
+// ============================================================
+// パスワード認証
+// ============================================================
+function unlock() {
+  var pw = document.getElementById('pwInput').value;
+  if (pw === 'keibi2024') {
+    document.getElementById('lockScreen').style.display = 'none';
+    document.getElementById('mainContent').style.display = 'block';
+    try { sessionStorage.setItem('keibi_auth', '1'); } catch(e) {}
+  } else {
+    document.getElementById('pwError').style.display = 'block';
+    document.getElementById('pwInput').value = '';
+  }
+}
+// 同じタブ内で再読み込みした場合は認証スキップ
+try {
+  if (sessionStorage.getItem('keibi_auth') === '1') {
+    document.getElementById('lockScreen').style.display = 'none';
+    document.getElementById('mainContent').style.display = 'block';
+  }
+} catch(e) {}
+</script>
+
+<script>
+// ============================================================
+// Q&A データ（既存の一覧表示用）
+// ============================================================
+const qaData = [
+  {
+    cat: "basic",
+    section: "基本・定義（第1条〜第2条）",
+    items: [
+      { q: "警備業法の目的は？", a: "警備業について必要な規制を定め、もって警備業務の実施の適正を図ることを目的としています。警備業が国民生活に密接に関わるため、質の確保と適正な運営を法律で担保しています。", ref: "第1条", refUrl: "https://laws.e-gov.go.jp/law/347AC0000000117#Mp-At_1" },
+      { q: "「警備業務」とはどのような業務を指しますか？", a: "警備業務は大きく4つに分類されます。<br><b>1号業務</b>：施設警備（事務所、住宅、興行場等での盗難・事故防止）<br><b>2号業務</b>：交通誘導・雑踏警備（人・車両が雑踏する場所での事故防止）<br><b>3号業務</b>：運搬警備（現金・貴金属等の運搬時の盗難防止）<br><b>4号業務</b>：身辺警備（人の身体に対する危害防止）", ref: "第2条第1項", refUrl: "https://laws.e-gov.go.jp/law/347AC0000000117#Mp-At_2" },
+      { q: "「警備業者」と「警備員」の違いは？", a: "「警備業者」は都道府県公安委員会の認定を受けて警備業を営む者（法人・個人）を指します。「警備員」は警備業者の下で警備業務に従事する者を指します。つまり、会社＝警備業者、そこで働く人＝警備員です。", ref: "第2条第3項・第4項", refUrl: "https://laws.e-gov.go.jp/law/347AC0000000117#Mp-At_2" },
+      { q: "警備業務は警察の権限と同じですか？", a: "いいえ。警備業法は「警備業務の実施に当たっては、他人の権利及び自由を侵害し、又は個人もしくは団体の正当な活動に干渉してはならない」と明確に定めています。警備員には特別な権限（逮捕権、交通規制権など）は与えられていません。", ref: "第15条", refUrl: "https://laws.e-gov.go.jp/law/347AC0000000117#Mp-At_15", important: "交通誘導で車両を止める行為は「お願い」であり、法的強制力はありません。警察官の指示とは異なることを社員に徹底してください。" }
+    ]
+  },
+  {
+    cat: "license",
+    section: "認定・届出（第4条〜第11条）",
+    items: [
+      { q: "警備業を始めるには何が必要？", a: "都道府県公安委員会の認定が必要です。認定を受けずに警備業を営むことはできません。主たる営業所の所在地を管轄する公安委員会に認定申請書を提出します。", ref: "第4条・第5条", refUrl: "https://laws.e-gov.go.jp/law/347AC0000000117#Mp-At_4" },
+      { q: "認定の有効期間は？", a: "認定の有効期間は<b>5年間</b>です。期間満了後も引き続き営業する場合は、更新の認定を受ける必要があります。更新手続きは期間満了の30日前までに行うのが一般的です。", ref: "第5条第3項", refUrl: "https://laws.e-gov.go.jp/law/347AC0000000117#Mp-At_5" },
+      { q: "営業所を新たに設ける場合の届出は？", a: "警備業者は、営業所の設置・移転・廃止をしたときは、当該届出事由が発生した日から<b>14日以内</b>に、主たる営業所の所在地を管轄する公安委員会に届け出なければなりません。", ref: "第9条", refUrl: "https://laws.e-gov.go.jp/law/347AC0000000117#Mp-At_9" },
+      { q: "警備業者の名簿（備付書類）には何を記載する？", a: "警備業者は営業所ごとに以下の書類を備えなければなりません。<br>・警備員の名簿（氏名、本籍、住所、生年月日、採用年月日 等）<br>・警備員の教育計画書・教育実施記録<br>・警備業務の依頼者等との契約に関する書類<br>この備付書類は公安委員会の立入検査の対象になります。", ref: "第45条", refUrl: "https://laws.e-gov.go.jp/law/347AC0000000117#Mp-At_45" }
+    ]
+  },
+  {
+    cat: "disqualify",
+    section: "欠格事由（第3条）",
+    items: [
+      { q: "警備業の認定が受けられない人（欠格事由）とは？", a: "以下のいずれかに該当する者は警備業の認定を受けることができません。<br>・破産手続開始の決定を受けて復権を得ない者<br>・禁錮以上の刑に処せられ、又は警備業法の規定に違反して罰金の刑に処せられ、その執行を終わり、又は受けることがなくなった日から起算して5年を経過しない者<br>・最近5年間に警備業法等の規定に基づく処分に違反した者<br>・暴力団員又は暴力団員でなくなった日から5年を経過しない者<br>・心身の障害により警備業務を適正に行うことができない者として内閣府令で定めるもの<br>・アルコール、麻薬、大麻、あへん又は覚醒剤の中毒者<br>・18歳未満の者", ref: "第3条", refUrl: "https://laws.e-gov.go.jp/law/347AC0000000117#Mp-At_3", important: "採用時にこの欠格事由に該当しないかを必ず確認してください。該当者を警備員として従事させた場合、警備業者も処分の対象になります。" },
+      { q: "18歳未満は警備員になれますか？", a: "なれません。18歳未満の者は、警備業法第3条の欠格事由に該当するため、警備業を営むことも、警備員として従事させることもできません。高校生のアルバイト等でも不可です。", ref: "第3条第1号、第14条第1項", refUrl: "https://laws.e-gov.go.jp/law/347AC0000000117#Mp-At_3" },
+      { q: "前科がある人は一切警備員になれない？", a: "一律にNGではありません。<b>禁錮以上の刑</b>の場合は、刑の執行終了等から<b>5年間</b>が欠格期間です。<b>罰金刑</b>の場合は、警備業法違反による罰金のみが欠格事由に該当します。つまり、交通違反の罰金などは欠格事由にはなりません。ただし、暴力団関係の場合は別途の欠格事由（第3条第4号）があります。", ref: "第3条第2号・第4号", refUrl: "https://laws.e-gov.go.jp/law/347AC0000000117#Mp-At_3" }
+    ]
+  },
+  {
+    cat: "education",
+    section: "教育・指導（第21条〜第22条）",
+    items: [
+      { q: "警備員指導教育責任者とは？", a: "各営業所に選任が義務付けられている資格者です。警備員の指導・教育に関する業務を担当し、教育計画の立案・実施・記録管理を行います。営業所ごとに、当該営業所で取り扱う警備業務の区分ごとに選任しなければなりません。", ref: "第22条", refUrl: "https://laws.e-gov.go.jp/law/347AC0000000117#Mp-At_22", important: "指導教育責任者の職務は第22条に基づく法定の義務です。教育記録の未作成は法令違反になります。" },
+      { q: "新任教育の時間数は？", a: "新たに警備業務に従事させようとする警備員に対しては、<b>基本教育＋業務別教育で合計20時間以上</b>の新任教育を行わなければなりません。<br>内訳は概ね：基本教育15時間以上、業務別教育15時間以上（ただし合計で20時間以上あればよい、という緩和措置あり ※施行規則参照）。<br>教育は実際に警備業務に従事させる<b>前</b>に完了させる必要があります。", ref: "第21条第2項、施行規則第38条", refUrl: "https://laws.e-gov.go.jp/law/347AC0000000117#Mp-At_21" },
+      { q: "現任教育の時間数と頻度は？", a: "現に警備業務に従事している警備員に対しては、<b>年度ごとに基本教育＋業務別教育で合計10時間以上</b>の現任教育を行わなければなりません。<br>年度（4月〜翌3月）ごとに実施する必要があり、前期・後期に分けて実施するのが一般的です。", ref: "第21条第2項、施行規則第38条", refUrl: "https://laws.e-gov.go.jp/law/347AC0000000117#Mp-At_21" },
+      { q: "教育を外部に委託できる？", a: "はい。教育については、警備員教育を行う者として内閣府令で定める要件を満たす者（他の警備業者、警備業協会等）に委託することが可能です。ただし、教育の実施責任は依然として当該警備業者にあるため、委託先の教育内容・記録を確認し、自社の教育記録として保管する必要があります。", ref: "第21条、施行規則第39条", refUrl: "https://laws.e-gov.go.jp/law/347AC0000000117#Mp-At_21" },
+      { q: "教育記録には何を書く？どのくらい保管する？", a: "教育記録には以下を記載します。<br>・教育を行った日時・場所<br>・教育を受けた警備員の氏名<br>・教育の内容（科目・実施項目）<br>・教育の時間数<br>・教育を行った者の氏名<br>教育に関する記録は、各教育を実施した日から<b>最低2年間</b>保管しなければなりません。", ref: "施行規則第40条", refUrl: "https://laws.e-gov.go.jp/law/358M50000002001" },
+      { q: "教育計画書はいつまでに提出？", a: "警備業者は年度ごとに教育計画書を作成し、営業所に備え付けなければなりません。年度開始前に計画を策定するのが望ましく、公安委員会の立入検査時にはこの計画書が確認されます。具体的な提出期限は都道府県によって指導が異なる場合がありますので、管轄の公安委員会に確認してください。", ref: "施行規則第40条関連", refUrl: "https://laws.e-gov.go.jp/law/358M50000002001" },
+      { q: "検定資格を持っている警備員の教育時間は免除される？", a: "はい、一定の軽減措置があります。当該警備業務の検定に合格した警備員については、新任教育・現任教育の一部が免除されます。ただし完全免除ではないため、施行規則で定める時間数の教育は必要です。詳細は施行規則第38条の別表を確認してください。", ref: "施行規則第38条別表", refUrl: "https://laws.e-gov.go.jp/law/358M50000002001" }
+    ]
+  },
+  {
+    cat: "traffic",
+    section: "交通誘導警備（2号業務関連）",
+    items: [
+      { q: "交通誘導警備の「検定合格警備員の配置義務」とは？", a: "高速道路や自動車専用道路、および都道府県公安委員会が指定する道路で交通誘導警備を行う場合は、<b>交通誘導警備業務検定（1級または2級）の合格者</b>を配置しなければなりません。いわゆる「検定配置路線」では、検定合格者がいない状態で業務を行うことは違法です。", ref: "第18条", refUrl: "https://laws.e-gov.go.jp/law/347AC0000000117#Mp-At_18", important: "配置義務路線で検定合格者が不在のまま業務を行った場合、警備業者に対して営業停止等の処分が下される可能性があります。現場配置計画時に必ず確認してください。" },
+      { q: "交通誘導警備業務検定の1級と2級の違いは？", a: "<b>2級</b>：交通誘導業務の基本。検定配置路線で従事するために必要な最低資格。<br><b>1級</b>：より高度な知識・技能。1級合格者は指導的立場で業務にあたれます。<br>1級を受検するには、2級合格後1年以上の実務経験が必要です。", ref: "第23条、施行規則", refUrl: "https://laws.e-gov.go.jp/law/347AC0000000117#Mp-At_23" },
+      { q: "交通誘導中の事故について、警備業者の責任は？", a: "警備業法上、警備業者は警備員の業務遂行について指導監督義務を負っています。交通誘導中の事故については、教育訓練の実施状況、適切な配置計画、安全装備の提供、疲労管理など、注意義務を尽くしていたかが問われます。労働安全衛生法上の義務も並行して適用されます。", ref: "第21条・第22条", refUrl: "https://laws.e-gov.go.jp/law/347AC0000000117#Mp-At_21" },
+      { q: "服装や装備に規定はある？", a: "警備員が着用する服装は、公安委員会に届出が必要です。また、服装は警察官や海上保安官の制服と明確に区別できるものでなければなりません。護身用具の携帯についても公安委員会の届出が必要で、業務の種別や態様に応じた護身用具のみが認められます。", ref: "第16条", refUrl: "https://laws.e-gov.go.jp/law/347AC0000000117#Mp-At_16", important: "特に交通誘導では、反射ベスト等の安全装備が業界基準で求められます。法定の服装届出に加え、安全装備の確認も教育に含めてください。" },
+      { q: "苦情処理はどうすればいい？", a: "警備業者は、警備業務に関して苦情の適切な解決に努めなければなりません。具体的には、苦情の内容・対応結果を記録し、営業所に備え付ける必要があります。苦情処理簿の備付は公安委員会の検査対象です。", ref: "第19条", refUrl: "https://laws.e-gov.go.jp/law/347AC0000000117#Mp-At_19" },
+      { q: "書面の交付義務（契約時）とは？", a: "警備業者は、警備業務の依頼者と契約を締結するにあたり、<b>契約締結前</b>と<b>契約締結時</b>の2回、法定の事項を記載した書面を交付しなければなりません。<br>記載事項には、警備業務の内容、対価、期間、緊急連絡体制、損害賠償に関する事項等が含まれます。", ref: "第19条第2項・第3項", refUrl: "https://laws.e-gov.go.jp/law/347AC0000000117#Mp-At_19" }
+    ]
+  },
+  {
+    cat: "penalty",
+    section: "罰則（第46条〜第58条）",
+    items: [
+      { q: "無認定で警備業を営んだ場合の罰則は？", a: "認定を受けないで警備業を営んだ者は、<b>100万円以下の罰金</b>に処せられます。", ref: "第57条", refUrl: "https://laws.e-gov.go.jp/law/347AC0000000117#Mp-At_57" },
+      { q: "教育義務違反の罰則は？", a: "警備員教育を行わなかった場合や、指導教育責任者を選任しなかった場合は、公安委員会から<b>指示処分</b>を受けます。指示に従わない場合は<b>営業停止処分</b>（最長6ヶ月）、さらにそれにも違反した場合は<b>認定の取消し</b>となり得ます。罰則としては<b>100万円以下の罰金</b>が科される場合があります。", ref: "第47条〜第49条", refUrl: "https://laws.e-gov.go.jp/law/347AC0000000117#Mp-At_47", important: "教育記録の不備は立入検査で最も多い指摘事項の一つです。記録は確実に残してください。" },
+      { q: "検定配置義務違反の罰則は？", a: "検定合格者の配置義務に違反した場合、公安委員会からの指示処分の対象となります。重大な場合は営業停止処分にまで発展する可能性があります。", ref: "第47条・第48条・第49条", refUrl: "https://laws.e-gov.go.jp/law/347AC0000000117#Mp-At_47" },
+      { q: "立入検査を拒否した場合は？", a: "公安委員会の立入検査を拒み、妨げ、又は忌避した場合は、<b>30万円以下の罰金</b>に処せられます。", ref: "第58条", refUrl: "https://laws.e-gov.go.jp/law/347AC0000000117#Mp-At_58" }
+    ]
+  },
+  {
+    cat: "inspection",
+    section: "検定・立入検査（第23条・第46条）",
+    items: [
+      { q: "警備員の検定制度とは？", a: "警備業務の種別ごとに、1級と2級の検定があります。検定は国家公安委員会規則で定められた知識・技能について行われ、<b>都道府県公安委員会が実施する直接検定</b>と、<b>登録講習機関が実施する特別講習を修了して申請する方法</b>の2つがあります。", ref: "第23条", refUrl: "https://laws.e-gov.go.jp/law/347AC0000000117#Mp-At_23" },
+      { q: "立入検査ではどこを見られる？", a: "公安委員会は、警備業者の営業所その他の施設に立ち入り、以下を検査できます。<br>・警備員名簿<br>・教育計画書・教育記録<br>・契約関係書類（書面交付義務の履行状況）<br>・苦情処理簿<br>・服装届出書類<br>・護身用具関連書類<br>・その他警備業法の規定遵守に関する書類全般", ref: "第46条", refUrl: "https://laws.e-gov.go.jp/law/347AC0000000117#Mp-At_46" },
+      { q: "公安委員会の「指示」「営業停止」「認定取消」の違いは？", a: "<b>指示</b>（第47条）：法令違反があった場合に、是正を求める処分。最も軽い。<br><b>営業停止</b>（第49条）：指示に従わない場合等に、一定期間（最長6ヶ月）営業を停止させる処分。<br><b>認定取消</b>（第48条・第49条）：重大な違反や営業停止処分に違反した場合等に、認定そのものを取り消す処分。最も重い。", ref: "第47条〜第49条", refUrl: "https://laws.e-gov.go.jp/law/347AC0000000117#Mp-At_47" }
+    ]
+  }
+];
+
+// ============================================================
+// Q&A一覧 レンダリング
+// ============================================================
+const qaContentEl = document.getElementById('qaContent');
+const noResultsEl = document.getElementById('noResults');
+const searchInput = document.getElementById('searchInput');
+let activeCategory = 'all';
+
+function renderQA(filter = '') {
+  qaContentEl.innerHTML = '';
+  let totalVisible = 0;
+  const keyword = filter.toLowerCase();
+  qaData.forEach(section => {
+    if (activeCategory !== 'all' && section.cat !== activeCategory) return;
+    const matchedItems = section.items.filter(item => {
+      if (!keyword) return true;
+      return item.q.toLowerCase().includes(keyword) || item.a.toLowerCase().includes(keyword) || item.ref.toLowerCase().includes(keyword);
+    });
+    if (matchedItems.length === 0) return;
+    totalVisible += matchedItems.length;
+    const sectionEl = document.createElement('div');
+    sectionEl.className = 'qa-section';
+    sectionEl.innerHTML = '<div class="section-title">' + section.section + '</div>';
+    matchedItems.forEach(item => {
+      const card = document.createElement('div');
+      card.className = 'qa-card';
+      let answerHtml = '<span class="a-label">A</span><p>' + hl(item.a, keyword) + '</p>';
+      if (item.important) answerHtml += '<div class="important">' + hl(item.important, keyword) + '</div>';
+      answerHtml += '<a class="law-ref" href="' + item.refUrl + '" target="_blank" rel="noopener">' + item.ref + ' → e-Gov原文を確認</a>';
+      card.innerHTML = '<a href="javascript:void(0)" class="qa-question" onclick="this.parentElement.classList.toggle(\'open\')"><span class="q-mark">Q</span><span class="q-text">' + hl(item.q, keyword) + '</span><span class="arrow">&#x25BC;</span></a><div class="qa-answer">' + answerHtml + '</div>';
+      sectionEl.appendChild(card);
+    });
+    qaContentEl.appendChild(sectionEl);
+  });
+  noResultsEl.style.display = totalVisible === 0 ? 'block' : 'none';
+}
+function hl(text, kw) {
+  if (!kw) return text;
+  const e = kw.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  return text.replace(new RegExp('(' + e + ')', 'gi'), '<span class="highlight">$1</span>');
+}
+document.querySelectorAll('.cat-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.cat-tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    activeCategory = tab.dataset.cat;
+    renderQA(searchInput.value);
+  });
+});
+searchInput.addEventListener('input', () => renderQA(searchInput.value));
+renderQA();
+
+// ============================================================
+// モード切替
+// ============================================================
+function switchMode(mode) {
+  var tabs = document.querySelectorAll('.mode-tab');
+  for (var i = 0; i < tabs.length; i++) { tabs[i].classList.remove('active'); }
+  var activeTab = document.querySelector('.mode-tab[data-mode="' + mode + '"]');
+  if (activeTab) activeTab.classList.add('active');
+  document.getElementById('qaPanel').style.display = mode === 'qa' ? 'block' : 'none';
+  var aiPanel = document.getElementById('aiChatPanel');
+  aiPanel.style.display = mode === 'ai' ? 'flex' : 'none';
+  if (mode === 'ai') aiPanel.className = 'active';
+  else aiPanel.className = '';
+  document.getElementById('searchBoxArea').style.display = mode === 'qa' ? 'block' : 'none';
+  if (mode === 'ai') initAiModel();
+}
+
+// ============================================================
+// APIキー管理
+// ============================================================
+var GEMINI_KEY = 'AQ.Ab8RN6LpODMsvU5nhzH_3xXJFqIinpR55U-qQOvuzLuxr6ykAw';
+var GEMINI_MODEL = '';
+
+function initAiModel() {
+  // モデルが既に設定済みなら何もしない
+  if (GEMINI_MODEL) return;
+
+  // キャッシュから読み込み試行
+  try {
+    var savedModel = localStorage.getItem('gemini_model');
+    if (savedModel) { GEMINI_MODEL = savedModel; return; }
+  } catch(e) { /* localStorage使用不可でも続行 */ }
+
+  // モデルを自動検出
+  findWorkingModel(GEMINI_KEY).then(function(m) {
+    if (m) {
+      GEMINI_MODEL = m;
+      try { localStorage.setItem('gemini_model', m); } catch(e) {}
+    }
+  });
+}
+
+async function findWorkingModel(key) {
+  // まずAPIからモデル一覧を取得して、使えるflashモデルを探す
+  try {
+    const res = await fetch('https://generativelanguage.googleapis.com/v1beta/models?key=' + key);
+    const data = await res.json();
+    if (data.models) {
+      // flashモデルを優先で探す（generateContentをサポートするもの）
+      const flashModels = data.models.filter(m =>
+        m.name.includes('flash') &&
+        m.supportedGenerationMethods &&
+        m.supportedGenerationMethods.includes('generateContent')
+      ).sort((a, b) => b.name.localeCompare(a.name)); // 新しい順
+      if (flashModels.length > 0) return flashModels[0].name.replace('models/', '');
+
+      // flashがなければgenerateContent対応のgeminiモデル
+      const geminiModels = data.models.filter(m =>
+        m.name.includes('gemini') &&
+        m.supportedGenerationMethods &&
+        m.supportedGenerationMethods.includes('generateContent')
+      ).sort((a, b) => b.name.localeCompare(a.name));
+      if (geminiModels.length > 0) return geminiModels[0].name.replace('models/', '');
+    }
+  } catch (e) { /* fall through */ }
+  return null;
+}
+
+// ============================================================
+// AIチャット
+// ============================================================
+const SYSTEM_PROMPT = `あなたは「警備業法Q&Aナビ」の専門アシスタントです。
+以下のルールに従って回答してください。
+
+【役割】
+- 日本の警備業法（昭和47年法律第117号）、警備業法施行令、警備業法施行規則に関する質問に、分かりやすく正確に答える
+- 質問者は交通誘導業務の会社で働く警備員指導教育責任者やその同僚を想定
+- 実務に即した具体的なアドバイスを心がける
+
+【回答のルール】
+1. 必ず根拠となる条文番号（例：第21条第2項）を明示する
+2. 条文の原文を確認できるe-Govのリンクを案内する：
+   - 警備業法：https://laws.e-gov.go.jp/law/347AC0000000117
+   - 施行令：https://laws.e-gov.go.jp/law/357CO0000000308
+   - 施行規則：https://laws.e-gov.go.jp/law/358M50000002001
+3. 法的な強制力のある回答と、業界慣行・推奨事項は区別して伝える
+4. 不確かな場合は「この点については管轄の公安委員会にご確認ください」と正直に伝える
+5. 交通誘導業務に特に関連する注意点があれば積極的に言及する
+6. 回答は簡潔に、要点を箇条書きで示した後、必要に応じて補足説明する
+7. 警備業法の範囲外の質問には、丁寧にその旨を伝える
+
+【安全上の注意】
+- 交通誘導に関する質問では、警備員の安全を最優先に考えた回答をする
+- 法令違反となるような助言は絶対にしない`;
+
+let chatHistory = [];
+
+function addMsg(role, html) {
+  const container = document.getElementById('chatMessages');
+  const div = document.createElement('div');
+  div.className = 'chat-msg ' + role;
+  div.innerHTML = '<div class="chat-avatar">' + (role === 'ai' ? 'AI' : 'You') + '</div><div class="chat-bubble">' + html + '</div>';
+  container.appendChild(div);
+  container.scrollTop = container.scrollHeight;
+}
+
+function showTyping() {
+  const container = document.getElementById('chatMessages');
+  const div = document.createElement('div');
+  div.className = 'chat-msg ai';
+  div.id = 'typingMsg';
+  div.innerHTML = '<div class="chat-avatar">AI</div><div class="typing-indicator"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div>';
+  container.appendChild(div);
+  container.scrollTop = container.scrollHeight;
+}
+function hideTyping() {
+  const el = document.getElementById('typingMsg');
+  if (el) el.remove();
+}
+
+function formatResponse(text) {
+  // マークダウン的な変換
+  let html = text
+    .replace(/\*\*(.*?)\*\*/g, '<b>$1</b>')
+    .replace(/\*(.*?)\*/g, '<i>$1</i>')
+    .replace(/^### (.+)$/gm, '<b style="color:#2c5282;">$1</b>')
+    .replace(/^## (.+)$/gm, '<b style="color:#2c5282;font-size:1em;">$1</b>')
+    .replace(/^- (.+)$/gm, '・$1')
+    .replace(/\n{2,}/g, '<br><br>')
+    .replace(/\n/g, '<br>');
+  // URLをリンクに
+  html = html.replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" target="_blank" rel="noopener">$1</a>');
+  return html;
+}
+
+async function sendMessage() {
+  const input = document.getElementById('chatInput');
+  const text = input.value.trim();
+  if (!text) return;
+  if (!GEMINI_MODEL) { alert('AIモデルを準備中です。少々お待ちください。'); return; }
+
+  input.value = '';
+  input.style.height = 'auto';
+  var sendBtn = document.getElementById('sendBtn');
+  sendBtn.style.pointerEvents = 'none';
+  sendBtn.style.opacity = '0.5';
+  document.getElementById('sampleQuestions').style.display = 'none';
+
+  addMsg('user', text.replace(/</g,'&lt;').replace(/>/g,'&gt;'));
+
+  // 履歴にユーザーメッセージを追加
+  chatHistory.push({ role: 'user', parts: [{ text: text }] });
+
+  showTyping();
+
+  try {
+    const body = {
+      system_instruction: { parts: [{ text: SYSTEM_PROMPT }] },
+      contents: chatHistory,
+      generationConfig: {
+        temperature: 0.3,
+        maxOutputTokens: 2048
+      }
+    };
+
+    const res = await fetch('https://generativelanguage.googleapis.com/v1beta/models/' + GEMINI_MODEL + ':generateContent?key=' + GEMINI_KEY, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+    const data = await res.json();
+    hideTyping();
+
+    if (data.candidates && data.candidates[0]?.content?.parts?.[0]?.text) {
+      const reply = data.candidates[0].content.parts[0].text;
+      chatHistory.push({ role: 'model', parts: [{ text: reply }] });
+      addMsg('ai', formatResponse(reply));
+    } else if (data.error) {
+      addMsg('ai', '<span style="color:#c53030;">エラー: ' + (data.error.message || 'APIエラーが発生しました') + '</span>');
+    } else {
+      addMsg('ai', '<span style="color:#c53030;">回答を取得できませんでした。もう一度お試しください。</span>');
+    }
+  } catch (err) {
+    hideTyping();
+    addMsg('ai', '<span style="color:#c53030;">通信エラー: ' + err.message + '</span>');
+  }
+
+  var sendBtn2 = document.getElementById('sendBtn');
+  sendBtn2.style.pointerEvents = '';
+  sendBtn2.style.opacity = '';
+  document.getElementById('chatInput').focus();
+}
+
+function askSample(el) {
+  document.getElementById('chatInput').value = el.textContent;
+  sendMessage();
+}
+
+function handleKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    sendMessage();
+  }
+  // テキストエリアの自動リサイズ
+  const ta = e.target;
+  setTimeout(() => {
+    ta.style.height = 'auto';
+    ta.style.height = Math.min(ta.scrollHeight, 120) + 'px';
+  }, 0);
+}
+
+// 初期化（ページ読み込み時）
+// モード切替なし。AIに質問タブ押下時にモデル検出開始。
+</script>
+
+</body>
+</html>
